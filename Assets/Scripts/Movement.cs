@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public Rigidbody rb;
+    
     [SerializeField] public float mainthrust;
     [SerializeField] public float rotationthrust;
+    [SerializeField] AudioClip mainEngine;
+
+    AudioSource audioSource;
+    public Rigidbody rb;
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -24,6 +30,11 @@ public class Movement : MonoBehaviour
     void ProcessThrust(){
         if(Input.GetKey(KeyCode.Space)){
             rb.AddRelativeForce(Vector3.up * mainthrust * Time.deltaTime);
+            if(!audioSource.isPlaying){
+                audioSource.PlayOneShot(mainEngine);
+            }
+        }else{
+            audioSource.Stop();
         }
         
         
