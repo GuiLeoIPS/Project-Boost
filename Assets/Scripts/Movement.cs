@@ -12,6 +12,10 @@ public class Movement : MonoBehaviour
     AudioSource audioSource;
     public Rigidbody rb;
 
+    [SerializeField] ParticleSystem mainThruster;
+    [SerializeField] ParticleSystem sideThrusterLeft;
+    [SerializeField] ParticleSystem sideThrusterRight;
+
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +34,7 @@ public class Movement : MonoBehaviour
     void ProcessThrust(){
         if(Input.GetKey(KeyCode.Space)){
             rb.AddRelativeForce(Vector3.up * mainthrust * Time.deltaTime);
+            mainThruster.Play();
             if(!audioSource.isPlaying){
                 audioSource.PlayOneShot(mainEngine);
             }
@@ -43,7 +48,9 @@ public class Movement : MonoBehaviour
     void ProcessRotation(){
         if(Input.GetKey(KeyCode.A)){
             ApplyRotation(rotationthrust);
+            sideThrusterRight.Play();
         }else if(Input.GetKey(KeyCode.D)){
+            sideThrusterLeft.Play();
             ApplyRotation(-rotationthrust);
         }
     }

@@ -1,59 +1,85 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class CollisionHandler : MonoBehaviour
 {
-    [SerializeField] float LevelLoadDelay = 2f;
-    [SerializeField] AudioClip CrashSound;
-    [SerializeField] AudioClip SuccessSound;
+    [SerializeField] float levelLoadDelay = 2f;
+    [SerializeField] AudioClip success;
+    [SerializeField] AudioClip crash;
+
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem crashParticles;
+
 
     AudioSource audioSource;
 
+    bool isTransitioning = false;
+    bool collisionDisabled = false;
 
-    void Start()
+    void Start() 
     {
         audioSource = GetComponent<AudioSource>();
     }
 
-    private void OnCollisionEnter(Collision other) 
+    void Update() {
+        RespondToDebugKeys();    
+    }
+    
+    void RespondToDebugKeys(){
+        if(Input.GetKeyDown(KeyCode.L)){
+            LoadNextLevel();
+        }
+        if(Input.GetKeyDown(KeyCode.G)){
+            collisionDisabled = !collisionDisabled;
+            if(collisionDisabled){
+                Debug.Log("God Mode Enabled");
+            }else{
+                Debug.Log("God Mode Disabled");
+            }
+        }
+    }
+
+
+    void OnCollisionEnter(Collision other) 
     {
+        if (isTransitioning || collisionDisabled) { return; }
+        
         switch (other.gameObject.tag)
         {
             case "Friendly":
                 Debug.Log("This thing is friendly");
                 break;
             case "Finish":
-            Debug.Log("You Passed the level");
                 StartSuccessSequence();
                 break;
-            default :
-                Debug.Log("You blew up");
+            default:
                 StartCrashSequence();
                 break;
         }
     }
 
-
-    void StartSuccessSequence (){
-        if(!audioSource.isPlaying){
-            audioSource.PlayOneShot(SuccessSound);
-         }
-        //PARTICLES
+    void StartSuccessSequence()
+    {
+        isTransitioning = true;
+        audioSource.Stop();
+        audioSource.PlayOneShot(success);
+        successParticles.Play();
         GetComponent<Movement>().enabled = false;
-        Invoke("LoadNextLevel", LevelLoadDelay);
+        Invoke("LoadNextLevel", levelLoadDelay);
     }
 
     void StartCrashSequence()
-    {   
-         if(!audioSource.isPlaying){
-            audioSource.PlayOneShot(CrashSound);
-         }
-        //PARTICLES
+    {
+        isTransitioning = true;
+        audioSource.Stop();
+        audioSource.PlayOneShot(crash);
+        crashParticles.Play();
         GetComponent<Movement>().enabled = false;
-        Invoke("ReloadLevel", LevelLoadDelay);
+        Invoke("ReloadLevel", levelLoadDelay);
     }
 
-     void LoadNextLevel()
+    void LoadNextLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
