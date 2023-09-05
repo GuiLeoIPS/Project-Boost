@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,7 +11,6 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] ParticleSystem successParticles;
     [SerializeField] ParticleSystem crashParticles;
 
-
     AudioSource audioSource;
 
     bool isTransitioning = false;
@@ -21,25 +20,23 @@ public class CollisionHandler : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
     }
-
-    void Update() {
+    
+    void Update() 
+    {
         RespondToDebugKeys();    
     }
-    
-    void RespondToDebugKeys(){
-        if(Input.GetKeyDown(KeyCode.L)){
+
+    void RespondToDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
             LoadNextLevel();
         }
-        if(Input.GetKeyDown(KeyCode.G)){
-            collisionDisabled = !collisionDisabled;
-            if(collisionDisabled){
-                Debug.Log("God Mode Enabled");
-            }else{
-                Debug.Log("God Mode Disabled");
-            }
-        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            collisionDisabled = !collisionDisabled;  // toggle collision
+        } 
     }
-
 
     void OnCollisionEnter(Collision other) 
     {
